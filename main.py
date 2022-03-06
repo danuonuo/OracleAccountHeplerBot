@@ -2,7 +2,7 @@
 
 import logging
 import time
-import mysql.connector
+#import mysql.connector
 import telegram
 from apscheduler.schedulers.background import BackgroundScheduler
 from telegram import (InlineKeyboardButton, InlineKeyboardMarkup,
@@ -19,7 +19,7 @@ TGTOKEN = ''
 #########################################################################################################################################################################################
 
 bot = telegram.Bot(token=TGTOKEN)
-mycursor = mydb.cursor()
+#mycursor = mydb.cursor()
 updater = Updater(token=TGTOKEN, use_context=True)
 dispatcher = updater.dispatcher
 # logging
