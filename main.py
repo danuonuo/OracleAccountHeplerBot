@@ -2,7 +2,7 @@
 
 import logging
 import time
-#import mysql.connector
+
 import telegram
 from apscheduler.schedulers.background import BackgroundScheduler
 from telegram import (InlineKeyboardButton, InlineKeyboardMarkup,
@@ -14,12 +14,12 @@ import os
 
 #########################################################################################################################################################################################
 
-TGTOKEN = ''
+TGTOKEN = '' #可在@botfather处申请
 
 #########################################################################################################################################################################################
 
 bot = telegram.Bot(token=TGTOKEN)
-#mycursor = mydb.cursor()
+
 updater = Updater(token=TGTOKEN, use_context=True)
 dispatcher = updater.dispatcher
 # logging
@@ -32,26 +32,25 @@ checkAccount = range(1)
 
 
 def start(update: Update, context: CallbackContext):
-    update.message.reply_text(text='Hi,我可以帮你检测Oracle账号状态，请输入你的账户名，每行一个。', parse_mode='HTML')
+    update.message.reply_text(text='Hi,我可以帮你检测Oracle账号状态，请输入你的账户名，每行一个。建议私聊使用', parse_mode='HTML')
     return checkAccount
 
 
 def checkAccount(update: Update, context: CallbackContext):
     ret1 = update.message.text
     accountList=str.splitlines(ret1)
-    retcode=''
     accok=0
-    for i in len(accountList):
-        if checkAccountIfActive(accountList[i])=='302':
+    for accountName in accountList:
+        if checkAccountIfActive(accountName)=='302':
             accok=accok+1
-        elif checkAccountIfActive(accountList[i])=='000':
-            update.message.reply_text(text='账号'+accountList[i]+'似乎不存在')
-        elif checkAccountIfActive(accountList[i]) == '503':
-            update.message.reply_text(text='账号' + accountList[i] + '似乎已被封号')
+        elif checkAccountIfActive(accountName)=='000':
+            update.message.reply_text(text='账号'+accountName+'似乎不存在')
+        elif checkAccountIfActive(accountName) == '503':
+            update.message.reply_text(text='账号' + accountName + '似乎已被封号')
         else:
-            update.message.reply_text(text='账号' + accountList[i] + '返回了未知状态码，为'+checkAccountIfActive(accountList[i]))
+            update.message.reply_text(text='账号' + accountName + '返回了未知状态码，为'+checkAccountIfActive(accountName))
 
-    update.message.reply_text(text='本次正常账号共'+accok+'个。',parse_mode='HTML')
+    update.message.reply_text(text='本次正常账号共'+str(accok)+'个。',parse_mode='HTML')
     return ConversationHandler.END
 
 def checkAccountIfActive(ret):
@@ -62,12 +61,7 @@ def checkAccountIfActive(ret):
     retcode = p.read()
     return retcode
 
-def dbWriteAccountInf(tgChatId, accountInf):
-    sql = "INSERT INTO accountInf (tgChatId, accountInf) VALUES (%s, %s)"
-    val = (tgChatId, accountInf)
-    mycursor.execute(sql, val)
-    mydb.commit()
-    return
+
 
 def cancel(update: Update, context: CallbackContext):
     return ConversationHandler.END
@@ -75,7 +69,7 @@ def cancel(update: Update, context: CallbackContext):
 
 def main():
     conv_handler = ConversationHandler(
-        entry_points=[CommandHandler('start', start, filters=Filters.chat_type.private)],
+        entry_points=[CommandHandler('start', start)],
         states={
             checkAccount: [MessageHandler(Filters.chat_type.private & Filters.text, checkAccount)],
         },
