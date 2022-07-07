@@ -11,6 +11,7 @@ from telegram.ext import (CallbackContext, CallbackQueryHandler,
                           CommandHandler, ConversationHandler, Filters,
                           MessageHandler, Updater)
 import os
+import uuid
 
 #########################################################################################################################################################################################
 
@@ -29,7 +30,10 @@ logger = logging.getLogger(__name__)
 #
 
 checkAccount = range(1)
+#preconfig
 
+os.system('mkdir ~/ocihelper')
+os.system('chmod 777 ~/ocihelper')
 
 def start(update: Update, context: CallbackContext):
     update.message.reply_text(text='Hi,我可以帮你检测Oracle账号状态，请输入你的账户名，每行一个。建议私聊使用', parse_mode='HTML')
@@ -53,11 +57,14 @@ def checkAccount(update: Update, context: CallbackContext):
     update.message.reply_text(text='本次正常账号共'+str(accok)+'个。',parse_mode='HTML')
     return ConversationHandler.END
 
+
+
 def checkAccountIfActive(ret):
-    os.system('rm -f test')
-    os.system('echo "' + ret + '" >> test')
+    uid=uuid.uuid4()
+    
+    os.system('echo "' + ret + '" >> ~/ocihelper/'+uid)
     p = os.popen(
-        "xargs -a test -I '{}' curl -m 10 -o /dev/null -s -w %{http_code} https://myservices-'{}'.console.oraclecloud.com/mycloud/cloudportal/gettingStarted")
+        "xargs -a ~/ocihelper/"+uid+" -I '{}' curl -m 10 -o /dev/null -s -w %{http_code} https://myservices-'{}'.console.oraclecloud.com/mycloud/cloudportal/gettingStarted")
     retcode = p.read()
     return retcode
 
