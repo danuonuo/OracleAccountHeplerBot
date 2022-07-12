@@ -66,7 +66,7 @@ def checkAccountIfActive(ret):
     p = os.popen(
         "xargs -a ~/ocihelper/"+uid+" -I '{}' curl -m 10 -o /dev/null -s -w %{http_code} https://myservices-'{}'.console.oraclecloud.com/mycloud/cloudportal/gettingStarted")
     retcode = p.read()
-    os.system('rm -f ~/ocihelper/'+uid')
+    os.system('rm -f ~/ocihelper/'+uid)
     return retcode
 
 
