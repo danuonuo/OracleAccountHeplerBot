@@ -60,12 +60,13 @@ def checkAccount(update: Update, context: CallbackContext):
 
 
 def checkAccountIfActive(ret):
-    uid=uuid.uuid4()
+    uid=str(uuid.uuid4())
     
     os.system('echo "' + ret + '" >> ~/ocihelper/'+uid)
     p = os.popen(
         "xargs -a ~/ocihelper/"+uid+" -I '{}' curl -m 10 -o /dev/null -s -w %{http_code} https://myservices-'{}'.console.oraclecloud.com/mycloud/cloudportal/gettingStarted")
     retcode = p.read()
+    os.system('rm -f ~/ocihelper/'+uid')
     return retcode
 
 
