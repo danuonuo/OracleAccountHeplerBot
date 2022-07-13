@@ -32,8 +32,7 @@ logger = logging.getLogger(__name__)
 checkAccount = range(1)
 # preconfig
 
-os.system('mkdir ~/ocihelper')
-os.system('chmod 777 ~/ocihelper')
+
 
 
 def start(update: Update, context: CallbackContext):
