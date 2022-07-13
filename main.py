@@ -12,6 +12,8 @@ from telegram.ext import (CallbackContext, CallbackQueryHandler,
                           MessageHandler, Updater)
 import os
 import requests
+import asyncio
+import aiohttp
 
 #########################################################################################################################################################################################
 
@@ -45,11 +47,12 @@ def checkAccount(update: Update, context: CallbackContext):
 	accountList = str.splitlines(ret1)
 	accok = 0
 	for accountName in accountList:
-		if checkAccountIfActive(accountName) == '302':
+		#update.message.reply_text(text='账号' + accountName + '返回状态码'+checkAccountIfActive(accountName))
+		if checkAccountIfActive(accountName) == 200:
 			accok = accok + 1
-		elif checkAccountIfActive(accountName) == '000':
-			update.message.reply_text(text='账号' + accountName + '似乎不存在')
-		elif checkAccountIfActive(accountName) == '503':
+		elif checkAccountIfActive(accountName) == 000:
+			update.message.reply_text(text='账号' + accountName + '似乎不存在或者已被封号')
+		elif checkAccountIfActive(accountName) == 503:
 			update.message.reply_text(text='账号' + accountName + '似乎已被封号')
 		else:
 			update.message.reply_text(text='账号' + accountName + '返回了未知状态码，为' + checkAccountIfActive(accountName))
@@ -57,10 +60,17 @@ def checkAccount(update: Update, context: CallbackContext):
 	update.message.reply_text(text='本次正常账号共' + str(accok) + '个。', parse_mode='HTML')
 	return ConversationHandler.END
 
+#async def getAccountCode(accountName):
+#	async with aiohttp.ClientSession() as session:
+#		async with session.get('http://httpbin.org/get') as resp:
+#			print(resp.status)
 
 def checkAccountIfActive(accountName):
-	tmp1=requests.get('https://myservices-' + accountName + '.console.oraclecloud.com/mycloud/cloudportal/gettingStarted')
-	retcode=tmp1.status_code
+	try:
+		tmp1=requests.get('https://myservices-' + accountName + '.console.oraclecloud.com/mycloud/cloudportal/gettingStarted',timeout=5)
+		retcode=tmp1.status_code
+	except requests.exceptions.ConnectionError:
+		retcode=000
 	return retcode
 
 
